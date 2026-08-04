@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "node scripts/testing/run-build-if-available.mjs",
     "preview": "vite preview",
     "backend": "node backend/scripts/backend-entry.mjs",
     "backend:ci": "npm run db:migrate && npm run db:seed:ci && node backend/server.js",
