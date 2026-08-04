@@ -4,8 +4,6 @@ import { spawnSync } from 'node:child_process';
 
 const requiredPaths = [
   'backend/server.js',
-  'backend/scripts/run-migrations.mjs',
-  'backend/scripts/seed-ci-data.mjs',
 ];
 
 const missing = requiredPaths.filter((file) => !existsSync(file));
