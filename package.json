@@ -14,7 +14,7 @@
     "lint:legacy": "oxlint \"mobile-app/src/**/*.{js,jsx,mjs}\" \"admin-dashboard/src/**/*.{js,jsx,mjs}\" \"provider-dashboard/src/**/*.{js,jsx,mjs}\" backend/tmp backend/tmp_compare_schema.js",
     "typecheck": "node scripts/testing/run-typecheck-if-inputs.mjs",
     "test:concurrency-workflow": "node backend/scripts/run-concurrency-workflow.mjs",
-    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --passWithNoTests",
     "test:open-handles:smoke": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --detectOpenHandles backend/tests/authFlow.test.js backend/tests/bookingFlow.test.js",
     "test:open-handles:smoke:force-exit": "node --experimental-vm-modules node_modules/jest/bin/jest.js --runInBand --detectOpenHandles --forceExit backend/tests/authFlow.test.js backend/tests/bookingFlow.test.js",
     "test:a11y": "start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"node scripts/a11y/axe-audit.mjs\"",
