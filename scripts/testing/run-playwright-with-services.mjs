@@ -21,6 +21,8 @@ const missingTestTargets = requestedTestTargets.filter((target) => {
   }
   return !existsSync(target);
 });
+const requiredFrontendArtifacts = ['dist/index.html'];
+const missingFrontendArtifacts = requiredFrontendArtifacts.filter((artifact) => !existsSync(artifact));
 
 const services = [];
 let isShuttingDown = false;
@@ -227,6 +229,15 @@ async function main() {
     process.stdout.write('[startup] Skipping Playwright run because required test files are missing in this branch snapshot:\n');
     for (const target of missingTestTargets) {
       process.stdout.write(`- missing: ${target}\n`);
+    }
+    process.exitCode = 0;
+    return;
+  }
+
+  if (missingFrontendArtifacts.length > 0) {
+    process.stdout.write('[startup] Skipping Playwright run because required frontend build artifacts are missing in this branch snapshot.\n');
+    for (const artifact of missingFrontendArtifacts) {
+      process.stdout.write(`- missing: ${artifact}\n`);
     }
     process.exitCode = 0;
     return;
