@@ -10,7 +10,7 @@
     "backend": "node backend/scripts/backend-entry.mjs",
     "backend:ci": "npm run db:migrate && npm run db:seed:ci && node backend/server.js",
     "lint": "npm run lint:prod && npm run lint:legacy",
-    "lint:prod": "eslint backend/config backend/controllers backend/middleware backend/models backend/routes backend/services backend/utils backend/validators src/client src/shared --ext .js,.jsx,.mjs --max-warnings=0",
+    "lint:prod": "eslint backend/config backend/controllers backend/middleware backend/models backend/routes backend/services backend/utils backend/validators src/client src/shared --ext .js,.jsx,.mjs --max-warnings=0 --no-error-on-unmatched-pattern",
     "lint:legacy": "oxlint \"mobile-app/src/**/*.{js,jsx,mjs}\" \"admin-dashboard/src/**/*.{js,jsx,mjs}\" \"provider-dashboard/src/**/*.{js,jsx,mjs}\" backend/tmp backend/tmp_compare_schema.js",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "test:concurrency-workflow": "node backend/scripts/run-concurrency-workflow.mjs",
