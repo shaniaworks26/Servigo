@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "types": ["node"],
+    "typeRoots": ["./node_modules/@types"]
+  },
+  "include": [
+    "src/**/*",
+    "backend/**/*",
+    "mobile-app/**/*",
+    "admin-dashboard/**/*",
+    "provider-dashboard/**/*"
+  ],
+  "exclude": ["node_modules", "dist"]
+}
