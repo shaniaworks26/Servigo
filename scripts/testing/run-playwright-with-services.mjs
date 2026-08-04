@@ -6,6 +6,7 @@ const BACKEND_URL = process.env.PW_BACKEND_HEALTH_URL || 'http://127.0.0.1:5005/
 const FRONTEND_URL = process.env.PW_FRONTEND_HEALTH_URL || 'http://127.0.0.1:4173';
 const STARTUP_TIMEOUT_MS = Number(process.env.PW_STARTUP_TIMEOUT_MS || 180000);
 const POLL_INTERVAL_MS = Number(process.env.PW_POLL_INTERVAL_MS || 1500);
+const PLAYWRIGHT_TIMEOUT_MS = Number(process.env.PW_PLAYWRIGHT_TIMEOUT_MS || 600000);
 
 const userArgs = process.argv.slice(2);
 const playwrightArgs = userArgs.length > 0
@@ -191,8 +192,28 @@ async function runPlaywright() {
       stdio: 'inherit',
     });
 
-    child.on('error', reject);
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      process.stderr.write(`[startup] Playwright exceeded timeout of ${PLAYWRIGHT_TIMEOUT_MS}ms. Terminating test process...\n`);
+      void killProcessTree(child.pid, 'SIGTERM');
+      setTimeout(() => {
+        void killProcessTree(child.pid, 'SIGKILL');
+      }, 2000);
+      settled = true;
+      reject(new Error(`Playwright did not complete within ${PLAYWRIGHT_TIMEOUT_MS}ms.`));
+    }, PLAYWRIGHT_TIMEOUT_MS);
+
+    child.on('error', (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(error);
+    });
     child.on('exit', (code, signal) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
       if (signal) {
         reject(new Error(`Playwright terminated by signal ${signal}`));
         return;
