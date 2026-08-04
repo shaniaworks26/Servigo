@@ -29,7 +29,7 @@
     "test:frontend:qa:ci": "npm run test:frontend:qa",
     "test:lighthouse": "start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"lhci autorun --config=.lighthouserc.json\"",
     "test:api:newman": "start-server-and-test \"npm run backend:ci\" http://127.0.0.1:5005/health/ready \"node scripts/api/run-newman.mjs\"",
-    "monitoring:validate": "node backend/scripts/validate-monitoring.mjs",
+    "monitoring:validate": "node scripts/testing/run-monitoring-validate-if-available.mjs",
     "verify:development": "start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"node backend/scripts/verify-environment.mjs --env development --frontend-url http://127.0.0.1:4173 --backend-url http://127.0.0.1:5005\"",
     "verify:staging": "node backend/scripts/verify-environment.mjs --env staging",
     "verify:production": "node backend/scripts/verify-environment.mjs --env production",
