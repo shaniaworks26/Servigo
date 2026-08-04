@@ -29,7 +29,7 @@ function runShellCommand(command) {
   });
 }
 
-async function killProcessTree(pid) {
+async function killProcessTree(pid, signal = 'SIGTERM') {
   if (!pid) return;
 
   if (process.platform === 'win32') {
@@ -38,9 +38,16 @@ async function killProcessTree(pid) {
   }
 
   try {
-    process.kill(-pid, 'SIGTERM');
+    process.kill(-pid, signal);
+    return;
   } catch {
-    // Ignore if process group does not exist.
+    // Fall back to direct PID when process groups are unavailable.
+  }
+
+  try {
+    process.kill(pid, signal);
+  } catch {
+    // Ignore if process no longer exists.
   }
 }
 
@@ -152,7 +159,7 @@ async function shutdownServices() {
 
   for (const { child } of services) {
     if (child.exitCode === null && !child.killed) {
-      await killProcessTree(child.pid);
+      await killProcessTree(child.pid, 'SIGTERM');
     }
   }
 
@@ -169,7 +176,7 @@ async function shutdownServices() {
 
   for (const { child } of services) {
     if (child.exitCode === null && !child.killed) {
-      await killProcessTree(child.pid);
+      await killProcessTree(child.pid, 'SIGKILL');
     }
   }
 }
