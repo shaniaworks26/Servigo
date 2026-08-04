@@ -89,6 +89,7 @@ async function clearPort(port, label) {
 function startService(name, command) {
   const child = spawn(command, {
     shell: true,
+    detached: process.platform !== 'win32',
     env: process.env,
     stdio: 'pipe',
   });
@@ -188,6 +189,7 @@ async function runPlaywright() {
 
     const child = spawn(command, {
       shell: true,
+      detached: process.platform !== 'win32',
       env: process.env,
       stdio: 'inherit',
     });
