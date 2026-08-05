@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "start": "node backend/scripts/backend-entry.mjs",
     "dev": "vite",
     "build": "node scripts/testing/run-build-if-available.mjs",
     "preview": "vite preview",
@@ -49,6 +50,8 @@
     "@sentry/node": "^10.11.0",
     "@stripe/react-stripe-js": "^6.8.0",
     "@stripe/stripe-js": "^9.12.1",
+    "@supabase/server": "^1.4.1",
+    "@supabase/supabase-js": "^2.112.1",
     "bcryptjs": "^3.0.3",
     "compression": "^1.8.1",
     "cookie-parser": "^1.4.7",
