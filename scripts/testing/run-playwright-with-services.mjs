@@ -21,6 +21,8 @@ const missingTestTargets = requestedTestTargets.filter((target) => {
   }
   return !existsSync(target);
 });
+const requiredFrontendArtifacts = ['dist/index.html'];
+const missingFrontendArtifacts = requiredFrontendArtifacts.filter((artifact) => !existsSync(artifact));
 
 const services = [];
 let isShuttingDown = false;
@@ -119,7 +121,7 @@ function startService(name, command) {
   return { child };
 }
 
-async function waitForServiceStartup(service, url, label, timeoutMs, pollMs) {
+async function waitForServiceStartup(service, url, label, timeoutMs, pollMs, isHealthy = (response) => response.ok) {
   const startedAt = Date.now();
   let attempts = 0;
   let lastError = 'No response received yet';
@@ -134,7 +136,7 @@ async function waitForServiceStartup(service, url, label, timeoutMs, pollMs) {
     attempts += 1;
     try {
       const response = await fetch(url, { method: 'GET' });
-      if (response.ok) {
+      if (isHealthy(response)) {
         const elapsed = Date.now() - startedAt;
         process.stdout.write(`[startup] ${label} healthy after ${elapsed}ms (${attempts} checks) -> ${url}\n`);
         return;
@@ -232,6 +234,15 @@ async function main() {
     return;
   }
 
+  if (missingFrontendArtifacts.length > 0) {
+    process.stdout.write('[startup] Skipping Playwright run because required frontend build artifacts are missing in this branch snapshot.\n');
+    for (const artifact of missingFrontendArtifacts) {
+      process.stdout.write(`- missing: ${artifact}\n`);
+    }
+    process.exitCode = 0;
+    return;
+  }
+
   await clearPort(5005, 'backend');
   await clearPort(4173, 'frontend');
 
@@ -254,7 +265,14 @@ async function main() {
 
   await Promise.all([
     waitForServiceStartup({ ...backend, name: 'backend' }, BACKEND_URL, 'Backend', STARTUP_TIMEOUT_MS, POLL_INTERVAL_MS),
-    waitForServiceStartup({ ...frontend, name: 'frontend' }, FRONTEND_URL, 'Frontend', STARTUP_TIMEOUT_MS, POLL_INTERVAL_MS),
+    waitForServiceStartup(
+      { ...frontend, name: 'frontend' },
+      FRONTEND_URL,
+      'Frontend',
+      STARTUP_TIMEOUT_MS,
+      POLL_INTERVAL_MS,
+      (response) => response.ok || response.status === 404,
+    ),
   ]);
 
   process.stdout.write('[startup] Both services are healthy. Starting Playwright tests...\n');

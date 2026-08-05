@@ -186,12 +186,10 @@ Operational note:
 Migration runner:
 
 - command: npm run db:migrate
-- implementation: [backend/scripts/run-migrations.mjs](backend/scripts/run-migrations.mjs)
 
 CI seed script:
 
 - command: npm run db:seed:ci
-- implementation: [backend/scripts/seed-ci-data.mjs](backend/scripts/seed-ci-data.mjs)
 
 Container startup behavior:
 
