@@ -3,6 +3,8 @@ import { exec as execCallback } from 'node:child_process';
 import { promisify } from 'node:util';
 import { existsSync } from 'node:fs';
 
+const isCi = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+
 const BACKEND_URL = process.env.PW_BACKEND_HEALTH_URL || 'http://127.0.0.1:5005/health/ready';
 const FRONTEND_URL = process.env.PW_FRONTEND_HEALTH_URL || 'http://127.0.0.1:4173';
 const STARTUP_TIMEOUT_MS = Number(process.env.PW_STARTUP_TIMEOUT_MS || 180000);
@@ -226,19 +228,31 @@ async function runPlaywright() {
 
 async function main() {
   if (missingTestTargets.length > 0) {
-    process.stdout.write('[startup] Skipping Playwright run because required test files are missing in this branch snapshot:\n');
+    process.stdout.write('[startup] Required Playwright test files are missing in this branch snapshot:\n');
     for (const target of missingTestTargets) {
       process.stdout.write(`- missing: ${target}\n`);
     }
+    if (isCi) {
+      process.stderr.write('[startup] Failing in CI because required Playwright test files are missing.\n');
+      process.exitCode = 1;
+      return;
+    }
+    process.stdout.write('[startup] Skipping Playwright run outside CI.\n');
     process.exitCode = 0;
     return;
   }
 
   if (missingFrontendArtifacts.length > 0) {
-    process.stdout.write('[startup] Skipping Playwright run because required frontend build artifacts are missing in this branch snapshot.\n');
+    process.stdout.write('[startup] Required frontend build artifacts are missing in this branch snapshot.\n');
     for (const artifact of missingFrontendArtifacts) {
       process.stdout.write(`- missing: ${artifact}\n`);
     }
+    if (isCi) {
+      process.stderr.write('[startup] Failing in CI because required frontend build artifacts are missing.\n');
+      process.exitCode = 1;
+      return;
+    }
+    process.stdout.write('[startup] Skipping Playwright run outside CI.\n');
     process.exitCode = 0;
     return;
   }

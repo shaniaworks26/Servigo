@@ -1,0 +1,11 @@
+groups:
+  - name: servigo.rules
+    rules:
+      - alert: ServigoBackendDown
+        expr: up{job="servigo-backend"} == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: ServiGo backend is down
+          description: ServiGo backend target has been unreachable for more than 5 minutes.
