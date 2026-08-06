@@ -9,7 +9,7 @@ This runbook defines how to deploy ServiGo safely across development, staging, a
 
 - Frontend: Vercel
 - Backend: Render
-- Database: Render PostgreSQL
+- Database: Neon PostgreSQL
 
 Local Docker assets remain available for parity testing and observability experiments.
 It covers:
@@ -28,7 +28,7 @@ Hosted services for the primary deployment stack:
 
 - Vercel-hosted frontend
 - Render-hosted backend
-- Render-managed PostgreSQL
+- Neon-managed PostgreSQL
 
 Optional local parity services from [docker-compose.production.yml](docker-compose.production.yml):
 
@@ -67,7 +67,6 @@ Health and observability endpoints:
 
 Source references:
 
-- [backend/.env.example](backend/.env.example)
 - [.env.example](.env.example)
 
 Minimum required values for non-local environments:
@@ -102,6 +101,22 @@ Minimum required values for non-local environments:
 | SENTRY_DSN | Recommended | Enables production error tracking |
 | SENTRY_TRACES_SAMPLE_RATE | Recommended | Controls trace volume |
 | LOG_FILE_PATH | Recommended | Enables file-backed structured logs for log dashboards |
+
+### Render and Vercel Env Checklist (Neon)
+
+Render backend service (`render.yaml` + Render dashboard):
+
+- Set `DATABASE_URL` to the Neon connection string from `neon env pull` or Neon dashboard.
+- Keep `PGSSLMODE=require`.
+- Set `FRONTEND_URL` and `CORS_ORIGIN` to the deployed Vercel URL.
+- Set runtime secrets on Render: `JWT_SECRET`, `JWT_REFRESH_SECRET`, `JWT_EMAIL_SECRET`.
+- Set optional integration secrets only when used (`SMTP_*`, `STRIPE_*`, `FIREBASE_*`, `SENTRY_DSN`).
+
+Vercel frontend project:
+
+- Set `VITE_API_URL` to the Render backend base URL (for example `https://<service>.onrender.com`).
+- Set frontend-only variables such as `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` when those integrations are enabled.
+- Do not set backend-only secrets on Vercel (`DATABASE_URL`, `JWT_*`, `SMTP_*`, `STRIPE_*`).
 
 ### Secret Manager Modes
 

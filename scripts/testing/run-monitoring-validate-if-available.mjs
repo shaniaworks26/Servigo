@@ -11,11 +11,12 @@ const requiredPaths = [
 const missing = requiredPaths.filter((file) => !existsSync(file));
 
 if (missing.length > 0) {
-  console.log('[monitoring:validate] Skipping because required monitoring files are missing in this branch snapshot.');
+  console.log('[monitoring:validate] Required monitoring files are missing in this branch snapshot.');
   for (const file of missing) {
     console.log(`- missing: ${file}`);
   }
-  process.exit(0);
+  console.error('[monitoring:validate] Failing because required monitoring files are missing.');
+  process.exit(1);
 }
 
 const result = spawnSync('node', ['backend/scripts/validate-monitoring.mjs'], {
