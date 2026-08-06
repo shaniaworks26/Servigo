@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node backend/scripts/backend-entry.mjs",
     "dev": "vite",
-    "build": "node scripts/testing/run-build-if-available.mjs",
+    "build": "vite build",
     "preview": "vite preview",
     "backend": "node backend/scripts/backend-entry.mjs",
     "backend:ci": "node scripts/testing/run-backend-ci-if-available.mjs",
@@ -39,8 +39,8 @@
     "dev:all": "concurrently \"npm run backend\" \"npm run dev\"",
     "db:migrate": "node backend/scripts/run-migrations.mjs",
     "db:seed:ci": "node backend/scripts/seed-ci-data.mjs",
-    "migrate": "node backend/db/migrations/add_profile_codes.mjs",
-    "migrate:check": "node backend/db/migrations/check_profile_codes.mjs"
+    "migrate": "npm run db:migrate",
+    "migrate:check": "npm run db:migrate"
   },
   "dependencies": {
     "@aws-sdk/client-secrets-manager": "^3.924.0",
