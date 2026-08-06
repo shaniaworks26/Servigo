@@ -46,9 +46,11 @@
     "migrate:check": "npm run db:migrate",
     "build:android": "npm --prefix mobile-app run build:android",
     "build:ios": "npm --prefix mobile-app run build:ios",
+    "build:ios:sim": "npm --prefix mobile-app run build:ios:sim",
     "build:all": "npm --prefix mobile-app run build:all",
     "mobile:build:android": "npm --prefix mobile-app run build:android",
     "mobile:build:ios": "npm --prefix mobile-app run build:ios",
+    "mobile:build:ios:sim": "npm --prefix mobile-app run build:ios:sim",
     "mobile:build:all": "npm --prefix mobile-app run build:all"
   },
   "dependencies": {

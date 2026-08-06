@@ -14,7 +14,10 @@
     },
     "ios": {
       "bundleIdentifier": "com.servigo.mobileapp",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -27,6 +30,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "82e1e0f4-a92d-41fd-903f-b9656514160d"
+      }
     }
   }
 }

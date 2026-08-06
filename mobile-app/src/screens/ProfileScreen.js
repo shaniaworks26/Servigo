@@ -46,8 +46,17 @@ export default function ProfileScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={handleSave}>
         <Text style={styles.buttonText}>Save profile</Text>
       </TouchableOpacity>
+      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('ClientSettings')}>
+        <Text style={styles.linkText}>Setting</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('ClientHelpCenter')}>
+        <Text style={styles.linkText}>Help Center</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={styles.linkButton} onPress={() => navigation.navigate('ClientHelpSupport')}>
+        <Text style={styles.linkText}>Help and Support</Text>
+      </TouchableOpacity>
       <TouchableOpacity style={styles.secondaryButton} onPress={handleLogout}>
-        <Text style={styles.secondaryText}>Log out</Text>
+        <Text style={styles.secondaryText}>Sign out</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -59,6 +68,8 @@ const styles = StyleSheet.create({
   subtitle: { color: '#64748b', marginBottom: 16 },
   input: { borderWidth: 1, borderColor: '#dbe4f0', borderRadius: 12, padding: 12, backgroundColor: '#fff', marginBottom: 12 },
   button: { backgroundColor: '#2563eb', borderRadius: 12, paddingVertical: 14, marginTop: 8 },
+  linkButton: { borderWidth: 1, borderColor: '#dbe4f0', borderRadius: 12, paddingVertical: 12, paddingHorizontal: 12, backgroundColor: '#fff', marginTop: 10 },
+  linkText: { color: '#0f172a', fontWeight: '600' },
   secondaryButton: { borderWidth: 1, borderColor: '#cbd5e1', borderRadius: 12, paddingVertical: 14, marginTop: 12 },
   buttonText: { color: '#fff', textAlign: 'center', fontWeight: '600' },
   secondaryText: { color: '#0f172a', textAlign: 'center', fontWeight: '600' },

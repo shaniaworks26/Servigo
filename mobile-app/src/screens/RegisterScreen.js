@@ -31,7 +31,7 @@ export default function RegisterScreen({ navigation }) {
       <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
         <Text style={styles.buttonText}>{loading ? 'Creating...' : 'Sign up'}</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate('CustomerTabs')}>
+      <TouchableOpacity onPress={() => navigation.navigate(form.role === 'provider' ? 'ProviderTabs' : 'CustomerTabs')}>
         <Text style={styles.link}>Skip and explore app</Text>
       </TouchableOpacity>
     </View>
