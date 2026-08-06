@@ -30,11 +30,9 @@ if (missing.length > 0) {
   process.exit(0);
 }
 
-const result = spawnSync('npx', [
-  'start-server-and-test',
-  'npm run preview -- --host 127.0.0.1 --port 4173',
-  'http://127.0.0.1:4173',
-  'lhci autorun --config=.lighthouserc.json',
+const result = spawnSync('npm', [
+  'run',
+  'test:lighthouse:smoke',
 ], {
   stdio: 'inherit',
   shell: process.platform === 'win32',

@@ -29,6 +29,7 @@
     "test:frontend:smoke:ci": "npm run test:frontend:smoke",
     "test:frontend:qa:ci": "npm run test:frontend:qa",
     "test:lighthouse": "node scripts/testing/run-lighthouse-if-available.mjs",
+    "test:lighthouse:smoke": "start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"lhci autorun --config=.lighthouserc.json\"",
     "test:api:newman": "node scripts/testing/run-newman-if-available.mjs",
     "monitoring:validate": "node scripts/testing/run-monitoring-validate-if-available.mjs",
     "verify:development": "start-server-and-test \"npm run preview -- --host 127.0.0.1 --port 4173\" http://127.0.0.1:4173 \"node backend/scripts/verify-environment.mjs --env development --frontend-url http://127.0.0.1:4173 --backend-url http://127.0.0.1:5005\"",

@@ -7,6 +7,10 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "export:web": "expo export -p web",
+    "verify:dist": "npm run export:web && node -e \"const fs=require('fs'); if(!fs.existsSync('dist/index.html')){console.error('dist build FAILED: dist/index.html missing'); process.exit(1)} console.log('dist build OK: dist/index.html found')\"",
+    "vercel:preview": "npm run export:web && npx -y vercel@latest deploy --cwd .",
+    "vercel:prod": "npm run export:web && npx -y vercel@latest deploy --cwd . --prod",
     "build:android": "npx -y eas-cli build -p android --profile production",
     "build:ios": "npx -y eas-cli build -p ios --profile production",
     "build:all": "npx -y eas-cli build --platform all --profile production"
