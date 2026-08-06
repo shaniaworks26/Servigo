@@ -18,7 +18,7 @@ test.describe('frontend a11y and responsive smoke', () => {
       const main = page.locator('main');
 
       await expect(page).toHaveTitle(/.+/);
-      await expect(main.or(page.locator('body'))).toBeVisible();
+      await expect(main.or(page.locator('body')).first()).toBeVisible();
     });
   }
 });

@@ -2,6 +2,8 @@ import { createServer } from 'node:http';
 import { existsSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 
+const isCi = process.env.CI === 'true' || process.env.GITHUB_ACTIONS === 'true';
+
 const requiredPaths = [
   'backend/server.js',
   'backend/scripts/run-migrations.mjs',
@@ -41,6 +43,11 @@ if (missing.length === 0) {
 console.log('[backend:ci] Starting mock backend because required backend runtime files are missing in this branch snapshot.');
 for (const file of missing) {
   console.log(`- missing: ${file}`);
+}
+
+if (isCi) {
+  console.error('[backend:ci] Failing in CI because required backend runtime files are missing.');
+  process.exit(1);
 }
 
 const port = Number(process.env.PORT || 5005);

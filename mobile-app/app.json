@@ -1,0 +1,32 @@
+{
+  "expo": {
+    "name": "mobile-app",
+    "slug": "mobile-app",
+    "version": "1.0.0",
+    "scheme": "servigo",
+    "android": {
+      "package": "com.servigo.mobileapp",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "edgeToEdgeEnabled": true
+    },
+    "ios": {
+      "bundleIdentifier": "com.servigo.mobileapp",
+      "supportsTablet": true
+    },
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    }
+  }
+}

@@ -21,6 +21,12 @@ ServiGo is a responsive React booking platform prototype built with JavaScript, 
    ```
 3. Open the URL shown by Vite (usually `http://localhost:5173`).
 
+Frontend runtime environment for API calls:
+
+- `VITE_API_URL`
+   - Example local: `http://127.0.0.1:5005`
+   - Example hosted: `https://your-render-service.onrender.com`
+
 ## Project Structure
 
 - `src/`
@@ -38,19 +44,21 @@ ServiGo is a responsive React booking platform prototype built with JavaScript, 
 
 This project now includes PostgreSQL database assets for the backend.
 
-1. Copy [.env.example](.env.example) to .env and update the `DATABASE_URL` value for your local PostgreSQL instance.
-2. Create a PostgreSQL database (for example `servigo`) and import the schema:
+1. Copy [.env.example](.env.example) to .env.
+2. Paste your Supabase PostgreSQL Connection Pooler URI into the `DATABASE_URL` value in `.env`.
+3. Keep `PGSSLMODE=require` for Supabase TLS.
+4. Run migrations:
    ```bash
-   psql -d servigo -f backend/db/servigo_postgresql_schema.sql
+   npm run db:migrate
    ```
-3. If you want to install the PostgreSQL client library for the backend runtime, run:
+5. If you want to install runtime dependencies, run:
    ```bash
    npm install
    ```
 
 ## Notes
 
-This project is a functional frontend prototype with PostgreSQL-ready backend database assets for future integration.    
+This project is a functional frontend prototype with a pg-backed backend runtime wired for Neon PostgreSQL.
 
 ## Production Hardening Commands
 
@@ -78,6 +86,10 @@ This project is a functional frontend prototype with PostgreSQL-ready backend da
    - `npm run verify:staging`
 - Production environment verification
    - `npm run verify:production`
+- Predeploy Render env guard (production profile)
+   - `npm run predeploy:check-env`
+- Predeploy Render env guard (staging profile)
+   - `npm run predeploy:check-env:staging`
 
 ## Playwright Service Runner
 
@@ -150,7 +162,8 @@ Troubleshooting:
 
 - Official hosted deployment stack
    - Frontend: Vercel via [vercel.json](vercel.json)
-   - Backend + PostgreSQL: Render via [render.yaml](render.yaml)
+   - Backend runtime: Render via [render.yaml](render.yaml)
+   - Database: Neon PostgreSQL (configure `DATABASE_URL` on Render)
 - GitHub Actions production gates
    - [.github/workflows/production-hardening.yml](.github/workflows/production-hardening.yml)
 - Backend container build/runtime
@@ -182,7 +195,7 @@ Troubleshooting:
 
 - Frontend: Vercel
 - Backend: Render
-- Database: Render PostgreSQL
+- Database: Neon PostgreSQL
 
 ## Local Production Stack Quick Start
 

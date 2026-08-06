@@ -1,0 +1,67 @@
+services:
+  - type: web
+    name: servigo-backend
+    runtime: node
+    rootDir: .
+    plan: starter
+    autoDeploy: true
+    buildCommand: npm ci
+    startCommand: npm run backend
+    healthCheckPath: /health/ready
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: APP_ENV
+        value: production
+      - key: SECRET_PROVIDER
+        value: env
+      - key: SECRET_MANAGER_ENABLED
+        value: "false"
+      - key: SECRET_MAPPING_JSON
+        value: "{}"
+      - key: ENFORCE_HTTPS
+        value: "true"
+      - key: PASSWORD_RESET_DELIVERY_MODE
+        value: log
+      - key: DATABASE_URL
+        sync: false
+      - key: PGSSLMODE
+        value: require
+      - key: PORT
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: JWT_REFRESH_SECRET
+        sync: false
+      - key: JWT_EMAIL_SECRET
+        sync: false
+      - key: JWT_EXPIRE
+        value: 7d
+      - key: JWT_REFRESH_EXPIRE
+        value: 30d
+      - key: EMAIL_VERIFICATION_EXPIRE
+        value: 1d
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_PATH
+        sync: false
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_TRACES_SAMPLE_RATE
+        value: "0.1"
