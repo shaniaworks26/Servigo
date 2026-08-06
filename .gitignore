@@ -15,6 +15,23 @@ test-results/
 # Vercel metadata
 .vercel/
 
+# Local platform/config artifacts (can include account/project metadata)
+.neon
+.agents/
+.claude/
+
+# Local API test artifacts
+newman/
+
+# Secret/key material
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+secrets/
+
 # Logs
 *.log
 npm-debug.log*
