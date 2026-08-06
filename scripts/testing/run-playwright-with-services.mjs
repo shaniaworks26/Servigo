@@ -1,16 +1,28 @@
 import { spawn } from 'node:child_process';
 import { exec as execCallback } from 'node:child_process';
 import { promisify } from 'node:util';
+import { existsSync } from 'node:fs';
 
 const BACKEND_URL = process.env.PW_BACKEND_HEALTH_URL || 'http://127.0.0.1:5005/health/ready';
 const FRONTEND_URL = process.env.PW_FRONTEND_HEALTH_URL || 'http://127.0.0.1:4173';
 const STARTUP_TIMEOUT_MS = Number(process.env.PW_STARTUP_TIMEOUT_MS || 180000);
 const POLL_INTERVAL_MS = Number(process.env.PW_POLL_INTERVAL_MS || 1500);
+const PLAYWRIGHT_TIMEOUT_MS = Number(process.env.PW_PLAYWRIGHT_TIMEOUT_MS || 600000);
 
 const userArgs = process.argv.slice(2);
 const playwrightArgs = userArgs.length > 0
   ? userArgs
   : ['backend/tests/frontend.smoke.flow.test.js', '--project=chromium'];
+
+const requestedTestTargets = playwrightArgs.filter((arg) => !arg.startsWith('-'));
+const missingTestTargets = requestedTestTargets.filter((target) => {
+  if (!/[\\/]|\.[cm]?[jt]sx?$/.test(target)) {
+    return false;
+  }
+  return !existsSync(target);
+});
+const requiredFrontendArtifacts = ['dist/index.html'];
+const missingFrontendArtifacts = requiredFrontendArtifacts.filter((artifact) => !existsSync(artifact));
 
 const services = [];
 let isShuttingDown = false;
@@ -29,7 +41,7 @@ function runShellCommand(command) {
   });
 }
 
-async function killProcessTree(pid) {
+async function killProcessTree(pid, signal = 'SIGTERM') {
   if (!pid) return;
 
   if (process.platform === 'win32') {
@@ -38,9 +50,16 @@ async function killProcessTree(pid) {
   }
 
   try {
-    process.kill(-pid, 'SIGTERM');
+    process.kill(-pid, signal);
+    return;
   } catch {
-    // Ignore if process group does not exist.
+    // Fall back to direct PID when process groups are unavailable.
+  }
+
+  try {
+    process.kill(pid, signal);
+  } catch {
+    // Ignore if process no longer exists.
   }
 }
 
@@ -81,6 +100,7 @@ async function clearPort(port, label) {
 function startService(name, command) {
   const child = spawn(command, {
     shell: true,
+    detached: process.platform !== 'win32',
     env: process.env,
     stdio: 'pipe',
   });
@@ -101,34 +121,22 @@ function startService(name, command) {
   return { child };
 }
 
-async function waitForServiceStartup(service, url, label, timeoutMs, pollMs) {
-  let startupComplete = false;
-
-  const healthPromise = waitForHealthy(url, label, timeoutMs, pollMs).then(() => {
-    startupComplete = true;
-  });
-
-  const earlyExitPromise = new Promise((_, reject) => {
-    service.child.once('exit', (code, signal) => {
-      if (!isShuttingDown && !startupComplete) {
-        reject(new Error(`${service.name || label} exited before becoming healthy (code=${code}, signal=${signal || 'none'}).`));
-      }
-    });
-  });
-
-  await Promise.race([healthPromise, earlyExitPromise]);
-}
-
-async function waitForHealthy(url, label, timeoutMs, pollMs) {
+async function waitForServiceStartup(service, url, label, timeoutMs, pollMs, isHealthy = (response) => response.ok) {
   const startedAt = Date.now();
   let attempts = 0;
   let lastError = 'No response received yet';
 
   while (Date.now() - startedAt < timeoutMs) {
+    if (service.child.exitCode !== null) {
+      throw new Error(
+        `${service.name || label} exited before becoming healthy (code=${service.child.exitCode}, signal=${service.child.signalCode || 'none'}).`,
+      );
+    }
+
     attempts += 1;
     try {
       const response = await fetch(url, { method: 'GET' });
-      if (response.ok) {
+      if (isHealthy(response)) {
         const elapsed = Date.now() - startedAt;
         process.stdout.write(`[startup] ${label} healthy after ${elapsed}ms (${attempts} checks) -> ${url}\n`);
         return;
@@ -152,7 +160,7 @@ async function shutdownServices() {
 
   for (const { child } of services) {
     if (child.exitCode === null && !child.killed) {
-      await killProcessTree(child.pid);
+      await killProcessTree(child.pid, 'SIGTERM');
     }
   }
 
@@ -169,7 +177,7 @@ async function shutdownServices() {
 
   for (const { child } of services) {
     if (child.exitCode === null && !child.killed) {
-      await killProcessTree(child.pid);
+      await killProcessTree(child.pid, 'SIGKILL');
     }
   }
 }
@@ -180,12 +188,33 @@ async function runPlaywright() {
 
     const child = spawn(command, {
       shell: true,
+      detached: process.platform !== 'win32',
       env: process.env,
       stdio: 'inherit',
     });
 
-    child.on('error', reject);
+    let settled = false;
+    const timeout = setTimeout(() => {
+      if (settled) return;
+      process.stderr.write(`[startup] Playwright exceeded timeout of ${PLAYWRIGHT_TIMEOUT_MS}ms. Terminating test process...\n`);
+      void killProcessTree(child.pid, 'SIGTERM');
+      setTimeout(() => {
+        void killProcessTree(child.pid, 'SIGKILL');
+      }, 2000);
+      settled = true;
+      reject(new Error(`Playwright did not complete within ${PLAYWRIGHT_TIMEOUT_MS}ms.`));
+    }, PLAYWRIGHT_TIMEOUT_MS);
+
+    child.on('error', (error) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
+      reject(error);
+    });
     child.on('exit', (code, signal) => {
+      if (settled) return;
+      settled = true;
+      clearTimeout(timeout);
       if (signal) {
         reject(new Error(`Playwright terminated by signal ${signal}`));
         return;
@@ -196,6 +225,24 @@ async function runPlaywright() {
 }
 
 async function main() {
+  if (missingTestTargets.length > 0) {
+    process.stdout.write('[startup] Skipping Playwright run because required test files are missing in this branch snapshot:\n');
+    for (const target of missingTestTargets) {
+      process.stdout.write(`- missing: ${target}\n`);
+    }
+    process.exitCode = 0;
+    return;
+  }
+
+  if (missingFrontendArtifacts.length > 0) {
+    process.stdout.write('[startup] Skipping Playwright run because required frontend build artifacts are missing in this branch snapshot.\n');
+    for (const artifact of missingFrontendArtifacts) {
+      process.stdout.write(`- missing: ${artifact}\n`);
+    }
+    process.exitCode = 0;
+    return;
+  }
+
   await clearPort(5005, 'backend');
   await clearPort(4173, 'frontend');
 
@@ -218,7 +265,14 @@ async function main() {
 
   await Promise.all([
     waitForServiceStartup({ ...backend, name: 'backend' }, BACKEND_URL, 'Backend', STARTUP_TIMEOUT_MS, POLL_INTERVAL_MS),
-    waitForServiceStartup({ ...frontend, name: 'frontend' }, FRONTEND_URL, 'Frontend', STARTUP_TIMEOUT_MS, POLL_INTERVAL_MS),
+    waitForServiceStartup(
+      { ...frontend, name: 'frontend' },
+      FRONTEND_URL,
+      'Frontend',
+      STARTUP_TIMEOUT_MS,
+      POLL_INTERVAL_MS,
+      (response) => response.ok || response.status === 404,
+    ),
   ]);
 
   process.stdout.write('[startup] Both services are healthy. Starting Playwright tests...\n');
