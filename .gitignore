@@ -19,6 +19,7 @@ test-results/
 .neon
 .agents/
 .claude/
+skills-lock.json
 
 # Local API test artifacts
 newman/
