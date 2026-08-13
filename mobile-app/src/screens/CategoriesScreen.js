@@ -3,12 +3,13 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-nati
 import { MaterialIcons } from '@expo/vector-icons';
 
 const CATEGORIES = [
+  { id: 'electricians', name: 'Electricians', icon: 'electrical-services' },
   { id: 'plumbing', name: 'Plumbing', icon: 'plumbing' },
-  { id: 'cleaning', name: 'Cleaning', icon: 'cleaning-services' },
-  { id: 'electrical', name: 'Electrical', icon: 'bolt' },
-  { id: 'handyman', name: 'Handyman', icon: 'build' },
-  { id: 'beauty', name: 'Beauty', icon: 'face-retouching-natural' },
-  { id: 'moving', name: 'Moving', icon: 'local-shipping' },
+  { id: 'ac-refrigeration-technicians', name: 'AC & Refrigeration Technicians', icon: 'ac-unit' },
+  { id: 'appliance-repair-specialists', name: 'Appliance Repair Specialists', icon: 'kitchen' },
+  { id: 'housekeepers-deep-cleaners', name: 'Housekeepers & Deep Cleaners', icon: 'cleaning-services' },
+  { id: 'carpet-upholstery-cleaners', name: 'Carpet & Upholstery Cleaners', icon: 'cleaning-services' },
+  { id: 'pest-control-specialists', name: 'Pest Control Specialists', icon: 'pest-control' },
 ];
 
 export default function CategoriesScreen({ navigation }) {

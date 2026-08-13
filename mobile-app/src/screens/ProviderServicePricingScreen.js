@@ -2,9 +2,13 @@ import React from 'react';
 import { ScrollView, View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 
 const SERVICES = [
-  { id: 's1', name: 'Pipe Leak Repair', price: 'JMD 5,500' },
-  { id: 's2', name: 'Drain Cleaning', price: 'JMD 4,200' },
-  { id: 's3', name: 'Fixture Installation', price: 'JMD 7,000' },
+  { id: 's1', name: 'Electricians', price: 'From JMD 6,500' },
+  { id: 's2', name: 'Plumbing', price: 'From JMD 5,500' },
+  { id: 's3', name: 'AC & Refrigeration Technicians', price: 'From JMD 7,800' },
+  { id: 's4', name: 'Appliance Repair Specialists', price: 'From JMD 6,900' },
+  { id: 's5', name: 'Housekeepers & Deep Cleaners', price: 'From JMD 4,600' },
+  { id: 's6', name: 'Carpet & Upholstery Cleaners', price: 'From JMD 5,900' },
+  { id: 's7', name: 'Pest Control Specialists', price: 'From JMD 5,200' },
 ];
 
 export default function ProviderServicePricingScreen() {

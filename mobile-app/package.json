@@ -13,6 +13,7 @@
     "vercel:prod": "npm run export:web && npx -y vercel@latest deploy --cwd . --prod",
     "build:android": "npx -y eas-cli build -p android --profile production",
     "build:ios": "npx -y eas-cli build -p ios --profile production",
+    "build:ios:check": "npx -y eas-cli whoami && npx -y eas-cli build -p ios --profile production",
     "build:ios:sim": "npx -y eas-cli build -p ios --profile ios-simulator",
     "build:all": "npx -y eas-cli build --platform all --profile production"
   },

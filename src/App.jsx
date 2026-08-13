@@ -5,6 +5,16 @@ const USERS_KEY = 'servigo.users.v1';
 const SESSION_KEY = 'servigo.session.v1';
 const ITEMS_KEY = 'servigo.items.v1';
 
+const PROVIDER_CATEGORIES = [
+  'Electricians',
+  'Plumbing',
+  'AC & Refrigeration Technicians',
+  'Appliance Repair Specialists',
+  'Housekeepers & Deep Cleaners',
+  'Carpet & Upholstery Cleaners',
+  'Pest Control Specialists',
+];
+
 function loadJson(key, fallback) {
   try {
     const raw = window.localStorage.getItem(key);
@@ -148,17 +158,6 @@ export default function App() {
     setItemInput('');
   }
 
-  function updateItem(itemId, nextTitle) {
-    const title = nextTitle.trim();
-    if (!title) return;
-
-    setItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, title, updatedAt: new Date().toISOString() } : item,
-      ),
-    );
-  }
-
   function deleteItem(itemId) {
     setItems((prev) => prev.filter((item) => item.id !== itemId));
   }
@@ -179,9 +178,20 @@ export default function App() {
     <main className="app-shell">
       <header className="card hero">
         <h1>ServiGo</h1>
-        <p>Frontend production app with auth + CRUD smoke coverage.</p>
+        <p>Service provider marketplace web app.</p>
         <p className={`status status-${status}`}>Backend connectivity: {status}</p>
       </header>
+
+      <section className="card">
+        <h2>Service Provider Categories</h2>
+        <ul className="provider-category-list">
+          {PROVIDER_CATEGORIES.map((category) => (
+            <li key={category} className="provider-category-item">
+              {category}
+            </li>
+          ))}
+        </ul>
+      </section>
 
       {!currentUser ? (
         <section className="card auth-card">
@@ -258,30 +268,24 @@ export default function App() {
                   type="text"
                   value={itemInput}
                   onChange={(event) => setItemInput(event.target.value)}
-                  placeholder="Need plumbing repair"
+                  placeholder="e.g. Need deep cleaning this Saturday"
                 />
               </label>
-              <button className="primary" type="submit">
-                Create
-              </button>
+              <button className="primary" type="submit">Add</button>
             </form>
 
-            <ul className="item-list" aria-label="Service requests list">
-              {userItems.length === 0 ? <li className="empty">No requests yet.</li> : null}
-              {userItems.map((item) => (
-                <li key={item.id} className="item-row">
-                  <input
-                    type="text"
-                    defaultValue={item.title}
-                    aria-label={`Request ${item.id}`}
-                    onBlur={(event) => updateItem(item.id, event.target.value)}
-                  />
-                  <button type="button" onClick={() => deleteItem(item.id)}>
-                    Delete
-                  </button>
-                </li>
-              ))}
-            </ul>
+            {userItems.length === 0 ? (
+              <p className="empty">No service requests yet.</p>
+            ) : (
+              <ul className="item-list">
+                {userItems.map((item) => (
+                  <li key={item.id} className="item-row">
+                    <span>{item.title}</span>
+                    <button type="button" onClick={() => deleteItem(item.id)}>Delete</button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
         </>
       )}
